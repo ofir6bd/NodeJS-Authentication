@@ -34,8 +34,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/userDB", { useNewUrlParser: true });
 
 const userSchema = new mongoose.Schema({
     email: String,
-    password: String,
-    secret: Srting
+    password: String
 });
 
 // userSchema.plugin(encrypt, {secret: process.env.SECRET, encryptedFields: ["password"]}); //need only this two lines to encrypt the info
@@ -65,45 +64,6 @@ app.get("/secrets", function(req,res){
         res.redirect("/login");
     }
 });
-
-app.get("/submit", function(req,res){
-    if(req.isAuthenticated()){
-        res.render("submit");
-    }else{
-        res.redirect("/login");
-    }
-});
-
-app.post("/submit",function(req,res){
-    const submittedSecret = req.body.secret;
-
-    User.findById(req.user.id, function(err, foundUser){
-        if(err){
-            console.log(err);
-        }else{
-            if (foundUser){
-                foundUser.secret = submittedSecret;
-                foundUser.save(function(){
-                    res.redirect("/secrets");
-                });
-            }
-        }
-    });
-});
-
-app.get("/secrets", function(req,res){
-    User.find({"secret":{$ne: null}},function(err,foundUsers){ //ne - not equal
-        if (err){
-            console.log(err);
-        }else{
-            if(foundUsers){
-                res.render("secrets", {userWithSecrets: foundUsers})
-            }
-        }
-    })    
-});
-
-
 
 app.post("/register", function(req,res){
     User.register({username: req.body.username}, req.body.password, function(err,user){
